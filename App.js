@@ -17,10 +17,12 @@ import {
   StatusBar,
   StyleSheet,
   Button,
-  Text, TextInput,
+  Text,
+  TextInput,
   useColorScheme,
   View,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 
 import {
@@ -65,14 +67,75 @@ function Logout(){
   return <Text>Trying to logout</Text>;
 }
 function Login(){
-  return (<NativeRouter><SafeAreaView><View>
-    <Text>Goahead and login</Text>
-      <Text>Login</Text>
-      <TextInput/>
-      <Text>Password</Text>
-      <TextInput textContentType={"password"} secureTextEntry={true}/>
-    <Button title="Login ☠️" onPress={() => {Alert.alert("WOO!")}}/>
-  </View></SafeAreaView></NativeRouter>);
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+
+
+  const [token, setToken] = useState("");
+
+  return (
+    <NativeRouter>
+      <SafeAreaView>
+        <View>
+          <Text>Godhead and login</Text>
+          <Text>Login</Text>
+          <TextInput value={login} autoCapitalize={'none'} onChangeText={setLogin}/>
+          <Text>Password</Text>
+          <TextInput value={password} onChangeText={setPassword} textContentType={'password'} secureTextEntry={true} />
+          <TouchableOpacity
+            color="#ff0000"
+            style={styles.button}
+            onPress={() => {
+              fetch("https://arslogi.ca/users/sign_in", {
+                method: 'POST',
+                headers: {
+                  'Content-type': 'application/json',
+                  Accept: 'application/json',
+                },
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                credentials: "include",
+                body: JSON.stringify({
+                  user: {
+                    "email": login,
+                    "password": password,
+                  },
+                }),
+              })
+              .then(response => {
+                console.log("LOGGG");
+                fetch('https://arslogi.ca/photos.json')
+                  .then(response => response.json())
+                  .then(json => {
+                    console.log(json);
+                  });
+                console.log(response);
+              }).catch(response => {
+                console.log('UH OH');
+              });
+            }}
+          >
+            <Text>Login 😆</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            color="#ff0000"
+            style={styles.button}
+            onPress={() => {
+              
+              fetch('https://arslogi.ca/users/sign_out',{
+                method: 'DELETE',
+                credentials: 'same-origin',
+              })
+                .then(response => {
+                  console.log(response)
+                });
+            }}
+          >
+            <Text>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </NativeRouter>);
 }
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -114,6 +177,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 18,
     fontWeight: '400',
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#4444ff',
+    color: '#ff4444',
+    borderRadius: 5,
+    padding: 10,
+    margin: 10,
   },
   highlight: {
     fontWeight: '700',
