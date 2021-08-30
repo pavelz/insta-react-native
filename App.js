@@ -6,17 +6,21 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, { useState } from "react";
 import type {Node} from 'react';
+import {Switch, NativeRouter, Route, Link } from "react-router-native";
+
 import {
   FlatList,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
+  Button,
+  Text, TextInput,
   useColorScheme,
   View,
+  Alert,
 } from "react-native";
 
 import {
@@ -54,21 +58,47 @@ const Section = ({children, title}): Node => {
     </View>
   );
 };
-
+function Home(){
+  return <StockMessage/>;
+}
+function Logout(){
+  return <Text>Trying to logout</Text>;
+}
+function Login(){
+  return (<NativeRouter><SafeAreaView><View>
+    <Text>Goahead and login</Text>
+      <Text>Login</Text>
+      <TextInput/>
+      <Text>Password</Text>
+      <TextInput textContentType={"password"} secureTextEntry={true}/>
+    <Button title="Login ☠️" onPress={() => {Alert.alert("WOO!")}}/>
+  </View></SafeAreaView></NativeRouter>);
+}
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [token, setToken] = useState([])
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-
-  return (
-      <View>
-        <Text>assdsad</Text>
-      <StockMessage/>
-      </View>
-
-  );
+  if( token != null ){
+    return Login();
+  } else {
+    return (
+      <NativeRouter>
+        <SafeAreaView>
+          <View>
+            <Link to="/"><Text>Home</Text></Link>
+            <Link to="/logout"><Text>Logout</Text></Link>
+            <Switch>
+              <Route exact path="/" component={Home} />
+              <Route path="/logout" component={Logout} />
+            </Switch>
+          </View>
+        </SafeAreaView>
+      </NativeRouter>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
